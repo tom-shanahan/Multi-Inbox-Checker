@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<h1>Gmail Checker Options</h1>
+
+<h2>Toggle Primary/Secondary Accounts:</h2>
+<select id='toggleAccounts'>
+    <option selected value='const_primary'>Constant Primary</option>
+    <option value='const_secondary'>Constant Secondary</option>
+    <option value='toggle'>Toggle Accounts</option>
+</select>
+
+<br>
+
+<h2>Update Frequency:</h2>
+<select id='updateFrequency'>
+    <option selected value=0.25>15 Seconds</option>
+    <option value=0.5>30 Seconds</option>
+    <option value=1>1 Minute</option>
+    <option value=3>3 Minutes</option>
+    <option value=5>5 Minutes</option>
+</select>
+
+<br><br>
+
+<button id="save">Save changes</button>
+<br>
+<div id="status"></div>
+<script src="options.js"></script>
+</html>
