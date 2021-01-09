@@ -1,7 +1,4 @@
 const atom_feed = 'https://mail.google.com/mail/u/ACCOUNT_ID/feed/atom/';
-// let unreadCount = -1;
-// let updateFrequency = 1;
-// let toggleAccounts = 'const_primary';
 let curAccount = 'primary';
 const accounts = {
     'primary':'0',
@@ -11,46 +8,57 @@ let unread_counts = {
     'primary':-1,
     'secondary':-1
 };
+let interval = setInterval(function(){ updateIcon(); }, localStorage.toggleFrequency * 1000);
 
 function initiate() {
-    if (!localStorage.updateFrequency)
+    if (!localStorage.hasOwnProperty('updateFrequency'))
         localStorage.updateFrequency = 1;
-    if (!localStorage.toggleAccounts)
+    if (!localStorage.hasOwnProperty('toggleAccounts'))
         localStorage.toggleAccounts = 'const_primary';
+    if (!localStorage.hasOwnProperty('toggleFrequency'))
+        localStorage.toggleFrequency = 10;
+    if (localStorage.toggleAccounts === 'const_secondary')
+        curAccount = 'secondary';
+
     localStorage.unreadCount = -1;
     getInboxCount();
     // chrome.alarms.create('refreshCount', { periodInMinutes: parseInt(updateFrequency) });
-    chrome.alarms.create('refreshCount', { periodInMinutes: 5 });
-    setInterval(function(){ updateIcon(); }, 5000);
+    chrome.alarms.create('refreshCount', { periodInMinutes: parseInt(localStorage.updateFrequency) });
 }
 
 function getInboxCount() {
-    let xhr = new XMLHttpRequest();
-    let abortTimer = window.setTimeout(function() { xhr.abort(); }, 10000);
-    chrome.alarms.create('refreshCount', { periodInMinutes:1 });
-    xhr.onreadystatechange = function() {
-        console.log("xhr.readyState",xhr.readyState);
-        if (xhr.readyState != 4) {
-            return;
-        }
-        if (xhr.responseXML) {
-            var xml = xhr.responseXML;
-            if (xml) {
-                unreadCount = xml.getElementsByTagName('fullcount')[0].textContent;
+    console.log('getInboxCount',localStorage.updateFrequency,new Date().toLocaleTimeString());
+    let accountArray = [curAccount];
+    if (localStorage.toggleAccounts === 'toggle')
+        accountArray = ['primary','secondary'];
+
+    accountArray.forEach(function (account) {
+        let xhr = new XMLHttpRequest();
+        let abortTimer = window.setTimeout(function() { xhr.abort(); }, 10000);
+        chrome.alarms.create('refreshCount', { periodInMinutes: parseInt(localStorage.updateFrequency) });
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== 4) {
+                return;
+            }
+            if (xhr.responseXML) {
+                var xml = xhr.responseXML;
+                if (xml) {
+                    unreadCount = xml.getElementsByTagName('fullcount')[0].textContent;
+                }
+                else {
+                    unreadCount = -1;
+                }
             }
             else {
                 unreadCount = -1;
             }
+            window.clearTimeout(abortTimer);
+            unread_counts[account] = unreadCount;
         }
-        else {
-            unreadCount = -1;
-        }
-        window.clearTimeout(abortTimer);
-        unread_counts[curAccount] = unreadCount;
-    }
-    current_feed = atom_feed.replace('ACCOUNT_ID', accounts[curAccount]);
-    xhr.open("GET", current_feed, true);
-    xhr.send(null);
+        current_feed = atom_feed.replace('ACCOUNT_ID', accounts[account]);
+        xhr.open("GET", current_feed, true);
+        xhr.send(null);
+    });
 }
 
 function toggleAccount() {
@@ -73,7 +81,7 @@ function updateIcon() {
     if (unread_counts[curAccount] === -1) {
         chrome.browserAction.setBadgeBackgroundColor({color: 'gray'});
         chrome.browserAction.setBadgeText({text:"?"});
-        chrome.browserAction.setIcon({path:"gmail_not_ready.png"});
+        chrome.browserAction.setIcon({path:"not_ready.png"});
     }
     else {
         if (curAccount === 'primary')
@@ -81,10 +89,11 @@ function updateIcon() {
         else
             chrome.browserAction.setBadgeBackgroundColor({color: 'red'});
         chrome.browserAction.setBadgeText({ text: unread_counts[curAccount].toString() });
-        chrome.browserAction.setIcon({path:"gmail_ready.png"});
+        chrome.browserAction.setIcon({path:"ready.png"});
     }
     // localStorage.unreadCount = count;
-    console.log('updateIcon',curAccount,localStorage.toggleAccounts)
+    clearInterval(interval);
+    interval = setInterval(function(){ updateIcon(); }, localStorage.toggleFrequency * 1000);
 }
 
 function getGmail() {
@@ -98,13 +107,13 @@ function isGmail(url) {
 function navigateToInbox() {
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
-            if (tab.url && isGmail(tab.url)) {
+            if (tab.url && tab.url.startsWith(getGmail() + 'u/' + accounts[curAccount])) {
                 chrome.tabs.update(tab.id, {selected: true});
                 getInboxCount();
                 return;
             }
         }
-        chrome.tabs.create({url: getGmail()});
+        chrome.tabs.create({url: getGmail() + '/u/' + accounts[curAccount]});
     });
 }
 

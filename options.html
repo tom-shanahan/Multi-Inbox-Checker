@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
 
-<h1>Gmail Checker Options</h1>
+<h1>Inbox Checker Options</h1>
 
-<h2>Toggle Primary/Secondary Accounts:</h2>
+<label for="toggleAccounts"> Toggle Primary/Secondary Accounts: </label>
 <select id='toggleAccounts'>
     <option selected value='const_primary'>Constant Primary</option>
     <option value='const_secondary'>Constant Secondary</option>
@@ -12,13 +12,22 @@
 
 <br>
 
-<h2>Update Frequency:</h2>
+<label for="toggleFrequency"> Toggle Frequency: </label>
+<select id='toggleFrequency'>
+    <option selected value=5>5 Seconds</option>
+    <option value=10>10 Seconds</option>
+    <option value=30>30 Seconds</option>
+    <option value=60>60 Seconds</option>
+</select>
+
+<br>
+
+<label for="updateFrequency"> Update Unread Count Frequency: </label>
 <select id='updateFrequency'>
-    <option selected value=0.25>15 Seconds</option>
-    <option value=0.5>30 Seconds</option>
-    <option value=1>1 Minute</option>
+    <option selected value=1>1 Minute</option>
     <option value=3>3 Minutes</option>
     <option value=5>5 Minutes</option>
+    <option value=10>10 Minutes</option>
 </select>
 
 <br><br>
