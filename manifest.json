@@ -1,5 +1,5 @@
 {
-  "name": "Inbox Checker",
+  "name": "Multi-Inbox Checker",
   "description": "Chrome extension displays the number of unread emails in inbox. Can automatically toggle between multiple accounts.",
   "version": "0.1.0",
   "manifest_version": 2,

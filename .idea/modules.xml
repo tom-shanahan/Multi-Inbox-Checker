@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/gmail-checker-for-chrome.iml" filepath="$PROJECT_DIR$/.idea/gmail-checker-for-chrome.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/multi-inbox-checker.iml" filepath="$PROJECT_DIR$/.idea/multi-inbox-checker.iml" />
     </modules>
   </component>
 </project>
